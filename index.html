@@ -1,36 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>WEB性能优化探索</title>
-	<link rel="stylesheet" href="./css/index.css">
-	 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title></title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+	<style>@-ms-viewport { width: device-width; }</style>
 
-	<style>
-		a{
-			color: red;
+	<style type="text/css">
+		body{
+			margin: 0;
+			padding: 0;
 		}
-		footer{
-			
+
+		#pano{
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
 		}
+	
 	</style>
 </head>
 <body>
 
 
-<footer>
-	<a href="https://github.com/GoogleChrome/lighthouse">CRP性能分析 Lighthouse</a>
-	<a href="https://cn.udacity.com">不错的学习网站 udacity</a>
-</footer>
+<div id="landscape-viewer">
+	<div id="pano"></div>
+</div>
+
+	
 
 
-<script>
-	document.write('内嵌脚本')
-</script>
-<!-- <pre class="prettyprint lang-javascript">
-let age = 0
-function getAge(){
-}
-</pre> -->
-<!-- 	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
- --></body>
+	<script src="./es5-shim.js"></script>
+	<script src="./eventShim.js"></script>
+	<script src="./requestAnimationFrame.js" ></script>
+<!-- 	<script src="../../build/marzipano.js" ></script>
+ -->
+ <script src="./dist/marzipano.js" ></script>
+
+
+	<script type="text/javascript">
+
+
+	    adjustContainerSize();
+
+	    window.onresize = adjustContainerSize;
+
+	    function adjustContainerSize(){
+	        var height = document.documentElement.clientHeight,
+	            width = document.documentElement.clientWidth,
+	            container = document.getElementById('landscape-viewer'),
+	            offset =(height - width) / 2;
+
+	        if (width > height) { // 横屏
+	          container.style.width = width + 'px'; 
+	          container.style.height = height + 'px';
+	          container.style.transform = ''; 
+	        } else {
+	          container.style.width = height + 'px'; 
+	          container.style.height = width + 'px';
+	          container.style.transform = 'rotate(90deg) ' + 'translate(' + offset + 'px,' + offset + 'px)';    
+	        }
+	    }
+
+
+	</script>
+
+
+	<script type="text/javascript">
+		var panoElement = document.getElementById('pano');
+		var viewerOpts = {
+		  controls: {
+		    mouseViewMode: 'drag'    // drag|qtvr
+		  }
+		};
+		var viewer = new Marzipano.Viewer(panoElement, viewerOpts)
+
+
+		var levels = [
+                {
+                    "tileSize": 128,
+                    "size": 128,
+                    "fallbackOnly": true
+                },
+                {
+                    "tileSize": 256,
+                    "size": 256
+                },
+                {
+                    "tileSize": 256,
+                    "size": 512
+                },
+                {
+                    "tileSize": 256,
+                    "size": 1024
+                }
+		];
+
+		var source = Marzipano.ImageUrlSource.fromString("tiles/0-/{z}/{f}/{y}/{x}.jpg");
+		var geometry = new Marzipano.CubeGeometry(levels);
+
+        let limiter = Marzipano.RectilinearView.limit.traditional(863, 100 * Math.PI / 180, 120 * Math.PI / 180);
+        let view = new Marzipano.RectilinearView({
+                "yaw": -3.091818304801315,
+                "pitch": -0.015911073480538107,
+                "fov": 1.6706627154563736
+            }, limiter);
+
+
+		var scene = viewer.createScene({
+		  source: source,
+		  geometry: geometry,
+		  view: view,
+		  pinFirstLevel: true
+		});
+
+		scene.switchTo({
+		  transitionDuration: 1000
+		});
+	</script>
+
+
+
+</body>
 </html>
